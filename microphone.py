@@ -1,5 +1,11 @@
 import pyaudio
 import wave
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
+from librosa.display import matplotlib
+import numpy as np
+from IPython.display import Audio, IFrame, display
 
 #paramtetry nagrania
 CHUNK = 1024
@@ -12,7 +18,15 @@ def record():
 	#inicjowanie sesji audio
 	audio = pyaudio.PyAudio()
 
-	stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True)
+
+	info = audio.get_host_api_info_by_index(0)
+	numdevices = info.get('deviceCount')
+	for i in range(0, numdevices):
+		if (audio.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+			print("Input Device id ", i, " - ", audio.get_device_info_by_host_api_device_index(0, i).get('name'))
+	input_id = int(input("Podaj wejście: "))
+
+	stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
 
 	print('starting recording')
 
@@ -48,5 +62,14 @@ def record_to_file(filepath):
 
 
 record_to_file('recording.wav')
+e_file1 = 'recording.wav'
 
 
+FILE,RATE = librosa.load(e_file1, mono=True, sr=RATE, offset=0, duration=librosa.get_duration(sr = RATE, path='recording.wav'))
+
+fig, ax = plt.subplots(nrows=2)
+librosa.display.waveshow(FILE,sr=RATE, ax=ax[0])
+S1 = librosa.feature.melspectrogram(y=FILE, sr=RATE, n_mels=64)
+D1 = librosa.power_to_db(S1, ref=np.max)
+librosa.display.specshow(D1, x_axis='time', y_axis='mel');
+plt.show()
