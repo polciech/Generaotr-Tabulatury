@@ -21,12 +21,13 @@ def record():
 
 	info = audio.get_host_api_info_by_index(0)
 	numdevices = info.get('deviceCount')
+
 	for i in range(0, numdevices):
 		if (audio.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
 			print("Input Device id ", i, " - ", audio.get_device_info_by_host_api_device_index(0, i).get('name'))
 	input_id = int(input("Podaj wejście: "))
 
-	stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
+	stream = audio.open(format= FORMAT, channels=CHANNELS, rate= RATE, frames_per_buffer=CHUNK, input= True)
 
 	print('starting recording')
 
@@ -67,9 +68,11 @@ e_file1 = 'recording.wav'
 
 FILE,RATE = librosa.load(e_file1, mono=True, sr=RATE, offset=0, duration=librosa.get_duration(sr = RATE, path='recording.wav'))
 
-fig, ax = plt.subplots(nrows=2)
-librosa.display.waveshow(FILE,sr=RATE, ax=ax[0])
+plot1 = plt.subplot(2,1,1)
+librosa.display.waveshow(FILE,sr=RATE)
+
 S1 = librosa.feature.melspectrogram(y=FILE, sr=RATE, n_mels=64)
 D1 = librosa.power_to_db(S1, ref=np.max)
-librosa.display.specshow(D1, x_axis='time', y_axis='mel');
+plot2 = plt.subplot(2,1,2)
+librosa.display.specshow(D1, x_axis='time', y_axis='mel')
 plt.show()
