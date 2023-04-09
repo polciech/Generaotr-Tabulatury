@@ -110,9 +110,9 @@ for frame_number in tqdm.tqdm(range(FRAME_COUNT)):
 
 final_notes=[]
 for i,item in enumerate(final_dict):
-  if i>1:
+  if i>1 and i<len(final_dict)-2:
     if item['amp']>AMP_THRESHOLD:
-      if item['amp'] > final_dict[i-1]['amp']+DIFF_THRESHOLD:
+      if item['amp'] > final_dict[i-1]['amp'] and item['amp']>final_dict[i+1]['amp']:
         final_notes.append(item['note'])
 print(final_notes)
 
