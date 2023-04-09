@@ -7,11 +7,11 @@ import numpy as np
 import tqdm
 
 
-
-
 # Configuration
 FPS = 30
 FFT_WINDOW_SECONDS = 0.25 # how many seconds of audio make up an FFT window
+AMP_THRESHOLD = 0.1
+DIFF_THRESHOLD = 0.1
 
 # Note range to display
 FREQ_MIN = 10
@@ -68,9 +68,9 @@ def find_top_notes(fft,num):
 
   return found
 
-def freq_to_number(f): return 69 + 12*np.log2(f/440.0)
-def number_to_freq(n): return 440 * 2.0**((n-69)/12.0)
-def note_name(n): return NOTE_NAMES[n % 12] + str(int(n/12 - 1))
+def freq_to_number(f): return 69 + 12*np.log2(f/220.0)
+def number_to_freq(n): return 220 * 2.0**((n-69)/12.0)
+def note_name(n): return NOTE_NAMES[n % 12] + str(int(n/12 - 2))
 
 # Hanning window function
 window = 0.5 * (1 - np.cos(np.linspace(0, 2*np.pi, FFT_WINDOW_SIZE, False)))
@@ -89,6 +89,8 @@ for frame_number in range(FRAME_COUNT):
   mx = max(np.max(fft),mx)
 
 print(f"Max amplitude: {mx}")
+final_dict = []
+
 
 # Pass 2, produce the animation
 for frame_number in tqdm.tqdm(range(FRAME_COUNT)):
@@ -98,5 +100,62 @@ for frame_number in tqdm.tqdm(range(FRAME_COUNT)):
   fft = np.abs(fft) / mx
 
   s = find_top_notes(fft,TOP_NOTES)
+  if s:
+    if s[0][0]> 81 and s[0][0]< 660:
+      frame_dict = {'amp':s[0][2],
+                'note':s[0][1],
+                'freq':s[0][0]}
 
-print(s)
+      final_dict.append(frame_dict)
+
+final_notes=[]
+for i,item in enumerate(final_dict):
+  if i>1:
+    if item['amp']>AMP_THRESHOLD:
+      if item['amp'] > final_dict[i-1]['amp']+DIFF_THRESHOLD:
+        final_notes.append(item['note'])
+print(final_notes)
+
+
+# for i in reversed(s):
+#   final_dict.values('notes')
+
+# print(s)
+# print(final_dict)
+
+
+# def creating_tab(final_notes):
+#   E4_row = ['E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5']
+#   B3_row = ['B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4']
+#   G3_row = ['G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4']
+#   D3_row = ['D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4']
+#   A2_row = ['A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3']
+#   E2_row = ['E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3']
+
+#   row_table = [E4_row, B3_row, G3_row, D3_row, A2_row, E2_row]
+#   row_names = ['E4', 'B3', 'G3', 'D3', 'A2', 'E2']
+
+#   row_number = 0
+
+#   for i in range(0, 6):
+#     if all(item in row_table[i] for item in final_notes) is True:
+#       row_number = i
+#       break
+
+#   final_tab = ''
+
+#   for i in range(0, 6):
+#     if i != row_number:
+#       final_tab = final_tab + row_names[i] + '| --' + len(final_notes)*'---' + '\n'
+
+#     else:
+#       final_tab = final_tab + row_names[i] + '| --'
+#       for j in range(0, len(final_notes)):
+#         final_tab = final_tab + str(row_table[i].index(final_notes[j])) + '--'
+
+#       final_tab = final_tab + '\n'
+
+
+#   return(final_tab)
+
+# print(creating_tab(final_list_of_notes))
