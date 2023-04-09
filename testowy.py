@@ -164,6 +164,6 @@ def writing_to_txt_file(tabulature):
   with open('tab.txt', 'w') as tab:
     tab.write(tabulature)
     
-writing_to_txt_file(creating_tab(final_notes))
+#writing_to_txt_file(creating_tab(final_notes))
 
 print(creating_tab(final_notes))
