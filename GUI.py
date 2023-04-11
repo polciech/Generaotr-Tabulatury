@@ -67,19 +67,19 @@ class GUI(QMainWindow):
             i = 1
 
             while exists :
-                if os.path.exists(f"recording{i}.wav"):
+                if os.path.exists(f"recordings/recording{i}.wav"):
                     i += 1
                 else:
                     exists = False
 
-            wf = wave.open(f"recording{i}.wav", 'wb')
+            wf = wave.open(f"recordings/recording{i}.wav", 'wb')
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(sample_width)
             wf.setframerate(RATE)
             wf.writeframes(b''.join(frames))
             wf.close()
             print(f"zapisano recording numer {i}")
-            writing_to_txt_file(creating_tab(find_notes(f"recording{i}.wav")))
+            writing_to_txt_file(creating_tab(find_notes(f"recordings/recording{i}.wav")))
 
 
 
