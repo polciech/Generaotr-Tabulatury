@@ -4,6 +4,7 @@ from scipy.io import wavfile # get the api
 import plotly.graph_objects as go
 import numpy as np
 import numpy as np
+import os
 import tqdm
 
 
@@ -150,7 +151,10 @@ def creating_tab(final_notes):
     final_tab_table[tup[1]] = final_tab_table[tup[1]] + str(row_table[tup[1]].index(tup[0])) + '--'
     for i in range(0, 6):
       if i != tup[1]:
-        final_tab_table[i] = final_tab_table[i] + '---'
+        if (row_table[tup[1]].index(tup[0])>9):
+          final_tab_table[i] = final_tab_table[i] + '----'
+        else:
+          final_tab_table[i]=final_tab_table[i] + '---'
 
   #summing lines to tab
   for line in final_tab_table:
@@ -161,8 +165,12 @@ def creating_tab(final_notes):
   return final_tab
 
 def writing_to_txt_file(tabulature):
-  with open('tab.txt', 'w') as tab:
+  exists = True
+  i = 1
+  while os.path.exists(f'tabs/tab{i}.txt'):
+    i+=1
+
+  with open(f'tabs/tab{i}.txt', 'w') as tab:
     tab.write(tabulature)
 
 #writing_to_txt_file(creating_tab(final_notes))
-
