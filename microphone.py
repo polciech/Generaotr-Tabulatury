@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 from librosa.display import matplotlib
 import numpy as np
 from IPython.display import Audio, IFrame, display
+from scipy.io import wavfile
+from scipy.fftpack import fft
+from testowy import find_notes, creating_tab, writing_to_txt_file
+
 
 #paramtetry nagrania
 CHUNK = 1024
@@ -62,17 +66,23 @@ def record_to_file(filepath):
 	wf.close()
 
 
+
+
+
 record_to_file('recording.wav')
 e_file1 = 'recording.wav'
 
 
-FILE,RATE = librosa.load(e_file1, mono=True, sr=RATE, offset=0, duration=librosa.get_duration(sr = RATE, path='recording.wav'))
 
-plot1 = plt.subplot(2,1,1)
-librosa.display.waveshow(FILE,sr=RATE)
+# FILE,RATE = librosa.load(e_file1, mono=True, sr=RATE, offset=0, duration=librosa.get_duration(sr = RATE, path='recording.wav'))
 
-S1 = librosa.feature.melspectrogram(y=FILE, sr=RATE, n_mels=64)
-D1 = librosa.power_to_db(S1, ref=np.max)
-plot2 = plt.subplot(2,1,2)
-librosa.display.specshow(D1, x_axis='time', y_axis='mel')
-plt.show()
+# plot1 = plt.subplot(2,1,1)
+# librosa.display.waveshow(FILE,sr=RATE)
+
+# S1 = librosa.feature.melspectrogram(y=FILE, sr=RATE, n_mels=64)
+# D1 = librosa.power_to_db(S1, ref=np.max)
+# plot2 = plt.subplot(2,1,2)
+# librosa.display.specshow(D1, x_axis='time', y_axis='mel')
+# plt.show()
+
+writing_to_txt_file(creating_tab(find_notes('recording.wav')))
