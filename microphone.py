@@ -69,8 +69,8 @@ def record_to_file(filepath):
 
 
 
-record_to_file('recording.wav')
-e_file1 = 'recording.wav'
+record_to_file('recordings/recording.wav')
+e_file1 = '/recordings/recording.wav'
 
 
 
@@ -85,4 +85,4 @@ e_file1 = 'recording.wav'
 # librosa.display.specshow(D1, x_axis='time', y_axis='mel')
 # plt.show()
 
-writing_to_txt_file(creating_tab(find_notes('recording.wav')))
+writing_to_txt_file(creating_tab(find_notes('\recordings\recording.wav')))
