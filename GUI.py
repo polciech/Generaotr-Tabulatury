@@ -1,8 +1,8 @@
 import sys
 import threading
-from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel, QFileDialog, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel, QFileDialog, QSizePolicy, QFileDialog, QSizePolicy, QVBoxLayout, QWidget
 
-from PySide6.QtCore import QFile, QFileSystemWatcher, Slot
+from PySide6.QtCore import QFile, QFileSystemWatcher, QFile, QFileSystemWatcher, Slot
 import pyaudio
 import wave
 import os
