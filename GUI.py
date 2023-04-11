@@ -1,7 +1,7 @@
 import sys
 import threading
-from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel
-from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel, QFileDialog, QSizePolicy
+from PySide6.QtCore import QFile, QFileSystemWatcher, Slot
 import pyaudio
 import wave
 import os
@@ -19,6 +19,7 @@ class GUI(QMainWindow):
         self.setGeometry(300, 200, 300, 300)
         self.setWindowTitle("Generator Tabulatury")
         self.initUI()
+        
         self.isrecording = False
 
 
@@ -26,12 +27,34 @@ class GUI(QMainWindow):
         self.label = QLabel(self)
         self.label.setText("kliknij guzik aby zaczac nagrywanie")
         self.label.move(50, 50)
-
+        self.tab = QLabel(self)
         self.state = 0
         self.b1 = QPushButton(self)
         self.b1.clicked.connect(self.click)
         self.b1.setText("rozpocznij nagrywanie")
         self.b1.move(110, 130)
+        self.tab.setText("Loading file...")
+        self.tab.move(110, 170)
+        self.tab.resize(500,200)
+        self.b1.clicked.connect(self.on_file_changed)
+        self.filepath = "tab.txt"
+        self.file = QFile("tab.txt")
+        self.file.open(QFile.ReadOnly | QFile.Text)
+
+        # Set the label to resize automatically
+        self.tab.setWordWrap(True)
+        self.tab.setScaledContents(True)
+        self.tab.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        self.watcher = QFileSystemWatcher()
+        self.watcher.addPath("tab.txt")
+        self.watcher.fileChanged.connect(self.on_file_changed)
+
+    @Slot(str)
+    def on_file_changed(self, path):
+        if path == self.filepath:
+            self.file.seek(0)
+            self.tab.setText(self.file.readAll().data().decode('utf-8'))
 
     def click(self):
         self.update()
@@ -83,9 +106,9 @@ class GUI(QMainWindow):
 
 
 
+
     def update(self):
         self.label.adjustSize()
-
 
 
 
