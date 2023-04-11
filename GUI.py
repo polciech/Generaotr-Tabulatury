@@ -5,6 +5,7 @@ from PySide6.QtCore import Slot
 import pyaudio
 import wave
 import os
+from testowy import find_notes, creating_tab, writing_to_txt_file
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -78,6 +79,7 @@ class GUI(QMainWindow):
             wf.writeframes(b''.join(frames))
             wf.close()
             print(f"zapisano recording numer {i}")
+            writing_to_txt_file(creating_tab(find_notes(f"recording{i}.wav")))
 
 
 
