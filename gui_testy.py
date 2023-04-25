@@ -331,46 +331,254 @@
 
 #========================================================================================================================
 
-import sys
-from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QSizePolicy
+# import sys
+# from PySide6.QtWidgets import QApplication, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QSizePolicy
 
-class MyWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+# class MyWidget(QWidget):
+#     def __init__(self):
+#         super().__init__()
 
-        # create a horizontal layout for the buttons
-        hbox = QHBoxLayout()
+#         # create a horizontal layout for the buttons
+#         hbox = QHBoxLayout()
 
-        # create the three buttons
-        previous_button = QPushButton('Previous')
-        play_button = QPushButton('Play')
-        next_button = QPushButton('Next')
+#         # create the three buttons
+#         previous_button = QPushButton('Previous')
+#         play_button = QPushButton('Play')
+#         next_button = QPushButton('Next')
 
-        # add some padding between the buttons
-        hbox.setSpacing(10)
+#         # add some padding between the buttons
+#         hbox.setSpacing(10)
 
-        # add the buttons to the layout with stretch factors
-        hbox.addWidget(previous_button, 1)
-        hbox.addWidget(play_button, 2)
-        hbox.addWidget(next_button, 1)
+#         # add the buttons to the layout with stretch factors
+#         hbox.addWidget(previous_button, 1)
+#         hbox.addWidget(play_button, 2)
+#         hbox.addWidget(next_button, 1)
 
-        # create a vertical layout for the widget
-        vbox = QVBoxLayout()
-        vbox.addStretch()
-        vbox.addLayout(hbox)
-        vbox.addStretch()
-        vbox.setContentsMargins(400, 0, 400, 0)
+#         # create a vertical layout for the widget
+#         vbox = QVBoxLayout()
+#         vbox.addStretch()
+#         vbox.addLayout(hbox)
+#         vbox.addStretch()
+#         vbox.setContentsMargins(400, 0, 400, 0)
 
-        # set the layout for the widget
-        self.setLayout(vbox)
+#         # set the layout for the widget
+#         self.setLayout(vbox)
 
-        # set the size of the widget to half of the screen size
-        screen = QApplication.primaryScreen()
-        screen_size = screen.availableGeometry()
-        self.setGeometry(0,0,1920,1080)
+#         # set the size of the widget to half of the screen size
+#         screen = QApplication.primaryScreen()
+#         screen_size = screen.availableGeometry()
+#         self.setGeometry(0,0,1920,1080)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    widget = MyWidget()
-    widget.show()
-    sys.exit(app.exec())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     widget = MyWidget()
+#     widget.show()
+#     sys.exit(app.exec())
+
+# ============================================================================
+
+
+
+# import sys
+# from PySide6.QtCore import Qt
+# from PySide6.QtGui import QColor
+# from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+
+# class MyWindow(QWidget):
+#     def __init__(self):
+#         super().__init__()
+
+#         # Set the window flags to enable custom title bar
+#         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+
+#         # Set the background color to transparent
+#         self.setAttribute(Qt.WA_TranslucentBackground)
+
+#         # Create the UI elements
+#         title_bar = self.create_title_bar()
+
+#         label = QLabel("Hello World!")
+#         layout = QVBoxLayout()
+#         layout.addWidget(title_bar)
+#         layout.addWidget(label)
+#         self.setLayout(layout)
+
+#     def create_title_bar(self):
+#         # Create the UI elements for the custom title bar
+#         minimize_button = QPushButton("Minimize")
+#         maximize_button = QPushButton("Maximize")
+#         close_button = QPushButton("Close")
+
+#         # Set the layout of the custom title bar
+#         layout = QHBoxLayout()
+#         layout.addWidget(minimize_button)
+#         layout.addWidget(maximize_button)
+#         layout.addWidget(close_button)
+#         layout.setAlignment(Qt.AlignRight)
+#         layout.setSpacing(0)
+#         layout.setContentsMargins(0, 0, 0, 0)
+
+#         # Create the widget for the custom title bar and set its layout
+#         title_bar_widget = QWidget()
+#         title_bar_widget.setLayout(layout)
+#         title_bar_widget.setStyleSheet("background-color: #282828;")
+
+#         return title_bar_widget
+
+# app = QApplication(sys.argv)
+
+# window = MyWindow()
+# window.setGeometry(100, 100, 400, 300)
+# window.show()
+
+# sys.exit(app.exec())
+
+# ========================================================================================================================================
+
+# import sys
+# from PySide6.QtCore import Qt, QPoint
+# from PySide6.QtGui import QCursor
+# from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
+
+# class MyWindow(QWidget):
+#     def __init__(self):
+#         super().__init__()
+
+#         # Set window properties
+#         self.setWindowFlags(Qt.FramelessWindowHint)
+
+#         # Create UI elements
+#         title_bar = QLabel("My Window Title")
+#         content = QLabel("Window Content")
+#         button_layout = QHBoxLayout()
+#         button_layout.addStretch()
+#         button_layout.addWidget(QLabel("Button 1"))
+#         button_layout.addWidget(QLabel("Button 2"))
+#         button_layout.addWidget(QLabel("Button 3"))
+
+#         # Create layout
+#         layout = QVBoxLayout()
+#         layout.addWidget(title_bar)
+#         layout.addWidget(content)
+#         layout.addLayout(button_layout)
+#         self.setLayout(layout)
+
+#         # Store the initial click position and whether the cursor is in the button layout
+#         self.click_position = None
+#         self.cursor_in_buttons = False
+
+#     def mousePressEvent(self, event):
+#         if event.button() == Qt.LeftButton:
+#             # Check if the cursor is in the button layout
+#             cursor_pos = event.pos()
+#             button_layout_pos = self.layout().itemAt(2).geometry()
+#             if button_layout_pos.contains(cursor_pos):
+#                 self.cursor_in_buttons = True
+#                 # Store the click position relative to the window
+#                 self.click_position = QCursor.pos() - self.frameGeometry().topLeft()
+#                 event.accept()
+
+#     def mouseMoveEvent(self, event):
+#         if event.buttons() == Qt.LeftButton and self.click_position is not None and self.cursor_in_buttons:
+#             # Move the window by the distance the mouse has been dragged since the click
+#             self.move(QCursor.pos() - self.click_position)
+#             event.accept()
+
+#     def mouseReleaseEvent(self, event):
+#         if event.button() == Qt.LeftButton:
+#             # Reset the cursor in buttons flag
+#             self.cursor_in_buttons = False
+#             self.click_position = None
+#             event.accept()
+
+# app = QApplication(sys.argv)
+
+# window = MyWindow()
+# window.setGeometry(100, 100, 400, 300)
+# window.show()
+
+# sys.exit(app.exec())
+
+# =====================================================================================================================================
+
+
+# import sys
+# from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+
+# class MainWindow(QMainWindow):
+#     def __init__(self):
+#         super().__init__()
+#         self.initUI()
+
+#     def initUI(self):
+#         self.setWindowTitle("My Application")
+
+#         # Create the "Load" button and connect it to the openFile function
+#         loadButton = QPushButton("Load", self)
+#         loadButton.clicked.connect(self.openFile)
+#         loadButton.setGeometry(50, 50, 100, 30)
+
+#         self.setGeometry(100, 100, 300, 200)
+#         self.show()
+
+#     def openFile(self):
+#         options = QFileDialog.Options()
+#         fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "All Files (*);;Text Files (*.txt)", options=options)
+#         if fileName:
+#             print("Selected file:", fileName)
+
+
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     window = MainWindow()
+#     sys.exit(app.exec_())
+
+# ==================================================================================================================================
+
+# import os
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import letter
+
+# def convert_tab_to_pdf(txt_file, pdf_file):
+#     # Read in the text file
+#     with open(txt_file, 'r') as f:
+#         tab_text = f.read()
+    
+#     # Create a PDF canvas and set the font
+#     pdf_canvas = canvas.Canvas(pdf_file, pagesize=letter)
+#     pdf_canvas.setFont("Courier", 10)
+    
+#     # Split the text into lines and draw them on the PDF canvas
+#     lines = tab_text.split('\n')
+#     y = 750  # Starting y position for the first line
+#     line_index = 0
+#     while line_index < len(lines):
+#         # Split the line into chunks no wider than 500 pixels
+#         chunks = [lines[line_index][i:i+50] for i in range(0, len(lines[line_index]), 50)]
+#         if len(chunks) == 1:
+#             # If the line has no spaces, write it out in parts every sixth line
+#             remaining_chunks = chunks[0]
+#             for i in range(line_index, line_index + 6):
+#                 if i >= len(lines):
+#                     break
+#                 if i == line_index:
+#                     pdf_canvas.drawString(50, y, remaining_chunks[:50])
+#                     remaining_chunks = remaining_chunks[50:]
+#                 else:
+#                     pdf_canvas.drawString(50, y, remaining_chunks[:50])
+#                     remaining_chunks = remaining_chunks[50:]
+#                     y -= 12
+#         else:
+#             # Write out the line normally
+#             for chunk in chunks:
+#                 pdf_canvas.drawString(50, y, chunk)
+#                 y -= 12
+#         line_index += 1
+    
+#     # Save the PDF file
+#     pdf_canvas.save()
+
+# # Example usage:
+# convert_tab_to_pdf('tab.txt', 'my_tab.pdf')
+
+# ==================================================================================================================================================================================

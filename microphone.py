@@ -86,3 +86,4 @@ e_file1 = 'recording.wav'
 # plt.show()
 
 writing_to_txt_file(creating_tab(find_notes('recording.wav')))
+
