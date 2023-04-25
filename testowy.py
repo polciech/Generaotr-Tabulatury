@@ -110,12 +110,14 @@ def find_notes(FILE_NAME):
         final_dict.append(frame_dict)
 
   final_notes=[]
+  final_freqs=[]
   for i,item in enumerate(final_dict):
    if i>1 and i<len(final_dict)-2:
      if item['amp']>AMP_THRESHOLD:
        if item['amp'] > final_dict[i-1]['amp'] and item['amp']>final_dict[i+1]['amp']:
          final_notes.append(item['note'])
-  return final_notes
+         final_freqs.append(item['freq'])
+  return final_notes, final_freqs
 
 def creating_tab(final_notes):
   E4_row = ['E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5']
