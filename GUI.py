@@ -1,15 +1,11 @@
-import sys
-import threading
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel, QFileDialog, QSizePolicy, QFileDialog, QSizePolicy, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QScrollArea
-from PySide6.QtGui import QFont
-from PySide6.QtCore import QFile, QFileSystemWatcher, QFile, QFileSystemWatcher, Slot
-from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPainter, QPalette, QCursor
-from PySide6.QtGui import QIcon
-import pyaudio
-import wave
-import os
+import sys, threading, pyaudio, wave, os
+from PySide6.QtCore import Qt, QFile, QFileSystemWatcher, QFile, QFileSystemWatcher, Slot
+from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QLabel, QFileDialog, QSizePolicy, QFileDialog, QSizePolicy, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QScrollArea, QScrollBar, QAbstractScrollArea
+from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPalette, QCursor, QIcon, QFont, QPainter
 from testowy import find_notes, creating_tab, writing_to_txt_file
+import numpy as np
+import sounddevice as sd
+import soundfile as sf
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -112,6 +108,7 @@ class GUI(QMainWindow):
         self.line.setGeometry(0,100,1920,2)
         self.gradient = QLabel()
         self.gradient.setGeometry(0,102,1920,978)
+        self.tab.setGeometry(0,102,1920,978)
         self.record_button = QPushButton(QIcon("microphone_unhovered.png"), "", self)
         self.record_button.setIconSize(self.record_button.size())
         self.play_button = QPushButton(QIcon("play_unhovered.png"), "", self)
@@ -159,10 +156,21 @@ class GUI(QMainWindow):
         self.dropdown.setStyleSheet("background-color: #464646; border-radius: 5px; border-style: none; color: white;")
         self.dropdown.setFixedWidth(175)
 
+        self.strojenia = QComboBox(self)
+
+        strojenia = ['Standardowy strój', 'Drop D', 'DADGAD', 'Double Drop D', 'D7sus4', 'Open D Major', 'Cmaj9sus4', 'Cmaj7sus4', 'Csus4', 'Open A Major', 'Open E Major', 'E Minor Sus4', 'Double E Double A', 'Open G Major']
+
+        for i in range(0, len(strojenia)):
+            self.strojenia.addItem(strojenia[i], userData=i)
+
+        self.strojenia.setStyleSheet("background-color: #464646; border-radius: 5px; border-style: none; color: white;")
+        self.strojenia.setFixedWidth(175)
+        self.strojenia.currentIndexChanged.connect(self.handle_selection_change)
+
         # Connect the dropdown's signal to a slot that updates the label
         self.dropdown.currentTextChanged.connect(self.update_list)
 
-        self.tab.setText("Loading file.................................................................................................................................................................................................................................................................................................................................")
+        self.tab.setText("Nagraj dźwięk lub otwórz poprzednie nagranie...")
         self.tab.move(110, 170)
 
         # Set cursor shape on hover
@@ -174,6 +182,8 @@ class GUI(QMainWindow):
         self.play_button.setStyleSheet(button_style)
         self.change_button.setStyleSheet(button_style)
         self.load_button.setStyleSheet(button_style)
+        self.play_button.clicked.connect(self.play_sound)
+        self.load_button.clicked.connect(self.load)
 
     #Tabulature window
 
@@ -200,19 +210,18 @@ class GUI(QMainWindow):
         # Set the label to resize automatically
         self.tab.setWordWrap(True)
         self.tab.setScaledContents(True)
-        self.tab.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
 
-        # Set a minimum width for the label (optional)
-        self.tab.setMinimumHeight(170)
-        self.tab.setMaximumWidth(1920)
-
-        scrollTab = QScrollArea()
-        scrollTab.setWidget(self.tab)
-        # scrollTab.setStyleSheet("QScrollBar:horizontal {background-color: transparent;}")
-
+        self.scrollTab = QScrollArea()
+        self.scrollTab.setWidget(self.tab)
+        self.scrollTab.setWidgetResizable(True)
+        self.scrollTab.setStyleSheet("background-color: transparent; border: none;")
+        self.scrollTab.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollTab.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     #Layouts
 
         # Create a vertical layout and add the label to it
+        widget = QWidget()
         title_layout = QHBoxLayout()
         title_buttons_layout = QHBoxLayout()
         title_bar_layout = QHBoxLayout()
@@ -232,9 +241,8 @@ class GUI(QMainWindow):
         title_bar_layout.addLayout(title_layout)
         title_bar_layout.addLayout(title_buttons_layout)
         title_bar_layout.setMenuBar(self.pane)
-
+        button_layout.addWidget(self.strojenia)
         button_layout.addWidget(self.play_button)
-        button_layout.addWidget(self.change_button)
         button_layout.addWidget(self.record_button)
         button_layout.addWidget(self.load_button)
         button_layout.addWidget(self.dropdown)
@@ -245,7 +253,7 @@ class GUI(QMainWindow):
         button_layout.setMenuBar(self.line)
         tab_layout.setMenuBar(self.gradient)
         # button_layout.addWidget(self.list)
-        tab_layout.addWidget(self.tab)
+        tab_layout.addWidget(self.scrollTab)
         tab_layout.setAlignment(Qt.AlignCenter)
 
         # Add the button layout and widget layout to a main layout
@@ -256,7 +264,7 @@ class GUI(QMainWindow):
         
 
         # Create a central widget and set the layout as its layout
-        widget = QWidget()
+        
         widget.setLayout(main_layout)
         self.setCentralWidget(widget)
 
@@ -273,6 +281,7 @@ class GUI(QMainWindow):
         if path == self.filepath:
             self.file.seek(0)
             self.tab.setText(self.file.readAll().data().decode('utf-8'))
+            self.scrollTab.horizontalScrollBar().setValue(self.scrollTab.horizontalScrollBar().maximum())
 
     def click(self):
         if self.isrecording:
@@ -291,6 +300,20 @@ class GUI(QMainWindow):
             self.showFullScreen()
         elif self.isFullScreen():
             self.showMaximized()
+
+    def load(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Wave Files (recording*.wav)", options=options)
+        if fileName:
+            print("Selected file:", fileName)
+        self.final_notes, self.final_freqs = find_notes(fileName)
+        writing_to_txt_file(creating_tab(self.final_notes))
+        self.play()
+
+    def handle_selection_change(self, index):
+        # Get the selected option's ID
+        self.wybrane_strojenie = self.strojenia.currentData()
+        print(self.wybrane_strojenie)
 
     def record(self):
             
@@ -324,7 +347,79 @@ class GUI(QMainWindow):
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
         wf.close()
-        writing_to_txt_file(creating_tab(find_notes(f"recording{i}.wav")))
+        self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
+        writing_to_txt_file(creating_tab(self.final_notes))
+        self.play()
+
+    def play(self):
+        
+        # Set the sample rate and duration
+        sample_rate = 44100 # in Hz
+        duration = 0.3 # in seconds
+
+        # Define a function to generate a sawtooth wave for a given frequency
+        def generate_sawtooth_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the sawtooth wave
+            sawtooth_wave = 2 * (frequency * time_array - np.floor(0.5 + frequency * time_array))
+
+            # Normalize the waveform
+            sawtooth_wave /= np.max(np.abs(sawtooth_wave))
+
+            return sawtooth_wave
+
+        # Define a function to generate a square wave for a given frequency
+        def generate_square_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the square wave
+            square_wave = np.sign(np.sin(2 * np.pi * frequency * time_array))
+
+            # Normalize the waveform
+            square_wave /= np.max(np.abs(square_wave))
+
+            return square_wave
+
+        # Define a function to generate a sine wave for a given frequency
+        def generate_sine_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the sine wave
+            sine_wave = np.sin(2 * np.pi * frequency * time_array)
+
+            # Normalize the waveform
+            sine_wave /= np.max(np.abs(sine_wave))
+
+            return sine_wave
+
+        sound = np.array([])
+        # Generate the sawtooth, square, and sine waves for a given note
+        for frequency in self.final_freqs:
+            sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
+            square_wave = generate_square_wave(frequency, duration, sample_rate)
+            sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+            combined_wave = sawtooth_wave + sine_wave
+            sound = np.concatenate((sound, combined_wave))
+        
+        output_play = "play.wav"
+        sf.write(output_play, sound, sample_rate)
+
+    def play_sound(self):
+        audio_data, _ = sf.read("play.wav")
+        sd.play(audio_data, 44100)
 
 def window ():
     app = QApplication(sys.argv)
