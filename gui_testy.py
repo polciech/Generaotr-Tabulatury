@@ -582,3 +582,42 @@
 # convert_tab_to_pdf('tab.txt', 'my_tab.pdf')
 
 # ==================================================================================================================================================================================
+
+import sys
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow
+
+
+class PhotoViewer(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        
+        # Set the window properties
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.WindowTransparentForInput)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowOpacity(0.5)
+        screen_geometry = QApplication.primaryScreen().geometry()
+        self.setGeometry(screen_geometry)
+        
+        # Set the label to display the photo
+        self.photo_label = QLabel(self)
+        self.photo_label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap("photo.png")
+        self.photo_label.setPixmap(pixmap)
+        self.photo_label.setGeometry((screen_geometry.width() - pixmap.width()) / 2,
+                                     0,
+                                     pixmap.width(), pixmap.height())
+        
+        # Show the window
+        self.show()
+        
+    def mousePressEvent(self, event):
+        # Close the app when the user clicks on the window
+        self.close()
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    photo_viewer = PhotoViewer()
+    sys.exit(app.exec())

@@ -10,6 +10,10 @@ import pyaudio
 import wave
 import os
 from testowy import find_notes, creating_tab, writing_to_txt_file
+import numpy as np
+import sounddevice as sd
+import time
+import soundfile as sf
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -174,6 +178,8 @@ class GUI(QMainWindow):
         self.play_button.setStyleSheet(button_style)
         self.change_button.setStyleSheet(button_style)
         self.load_button.setStyleSheet(button_style)
+        self.play_button.clicked.connect(self.play_sound)
+        self.load_button.clicked.connect(self.load)
 
     #Tabulature window
 
@@ -292,6 +298,15 @@ class GUI(QMainWindow):
         elif self.isFullScreen():
             self.showMaximized()
 
+    def load(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Wave Files (*.wav)", options=options)
+        if fileName:
+            print("Selected file:", fileName)
+        self.final_notes, self.final_freqs = find_notes(fileName)
+        writing_to_txt_file(creating_tab(self.final_notes))
+        self.play()
+
     def record(self):
             
         audio = pyaudio.PyAudio()
@@ -324,7 +339,79 @@ class GUI(QMainWindow):
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
         wf.close()
-        writing_to_txt_file(creating_tab(find_notes(f"recording{i}.wav")))
+        self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
+        writing_to_txt_file(creating_tab(self.final_notes))
+        self.play()
+
+    def play(self):
+        
+        # Set the sample rate and duration
+        sample_rate = 44100 # in Hz
+        duration = 0.3 # in seconds
+
+        # Define a function to generate a sawtooth wave for a given frequency
+        def generate_sawtooth_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the sawtooth wave
+            sawtooth_wave = 2 * (frequency * time_array - np.floor(0.5 + frequency * time_array))
+
+            # Normalize the waveform
+            sawtooth_wave /= np.max(np.abs(sawtooth_wave))
+
+            return sawtooth_wave
+
+        # Define a function to generate a square wave for a given frequency
+        def generate_square_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the square wave
+            square_wave = np.sign(np.sin(2 * np.pi * frequency * time_array))
+
+            # Normalize the waveform
+            square_wave /= np.max(np.abs(square_wave))
+
+            return square_wave
+
+        # Define a function to generate a sine wave for a given frequency
+        def generate_sine_wave(frequency, duration, sample_rate):
+            # Calculate the number of samples
+            num_samples = duration * sample_rate
+
+            # Calculate the time array
+            time_array = np.arange(num_samples) / sample_rate
+
+            # Calculate the sine wave
+            sine_wave = np.sin(2 * np.pi * frequency * time_array)
+
+            # Normalize the waveform
+            sine_wave /= np.max(np.abs(sine_wave))
+
+            return sine_wave
+
+        sound = np.array([])
+        # Generate the sawtooth, square, and sine waves for a given note
+        for frequency in self.final_freqs:
+            sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
+            square_wave = generate_square_wave(frequency, duration, sample_rate)
+            sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+            combined_wave = sawtooth_wave + sine_wave + square_wave
+            sound = np.concatenate((sound, combined_wave))
+        
+        output_play = "play.wav"
+        sf.write(output_play, sound, sample_rate)
+
+    def play_sound(self):
+        audio_data, _ = sf.read("play.wav")
+        sd.play(audio_data, 44100)
 
 def window ():
     app = QApplication(sys.argv)
