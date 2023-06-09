@@ -5,6 +5,10 @@ from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPalette, QCursor, QI
 from testowy import find_notes, creating_tab, writing_to_txt_file
 import numpy as np
 import sounddevice as sd
+<<<<<<< HEAD
+=======
+import time
+>>>>>>> 945f335e7899bac441be4036b189ed8207210db3
 import soundfile as sf
 
 CHUNK = 1024
@@ -303,18 +307,25 @@ class GUI(QMainWindow):
 
     def load(self):
         options = QFileDialog.Options()
+<<<<<<< HEAD
         fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Wave Files (recording*.wav)", options=options)
+=======
+        fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Wave Files (*.wav)", options=options)
+>>>>>>> 945f335e7899bac441be4036b189ed8207210db3
         if fileName:
             print("Selected file:", fileName)
         self.final_notes, self.final_freqs = find_notes(fileName)
         writing_to_txt_file(creating_tab(self.final_notes))
         self.play()
 
+<<<<<<< HEAD
     def handle_selection_change(self, index):
         # Get the selected option's ID
         self.wybrane_strojenie = self.strojenia.currentData()
         print(self.wybrane_strojenie)
 
+=======
+>>>>>>> 945f335e7899bac441be4036b189ed8207210db3
     def record(self):
             
         audio = pyaudio.PyAudio()
@@ -411,7 +422,11 @@ class GUI(QMainWindow):
             sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
             square_wave = generate_square_wave(frequency, duration, sample_rate)
             sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+<<<<<<< HEAD
             combined_wave = sawtooth_wave + sine_wave
+=======
+            combined_wave = sawtooth_wave + sine_wave + square_wave
+>>>>>>> 945f335e7899bac441be4036b189ed8207210db3
             sound = np.concatenate((sound, combined_wave))
         
         output_play = "play.wav"

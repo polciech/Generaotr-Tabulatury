@@ -3,19 +3,7 @@ import sounddevice as sd
 
 # Set the sample rate and duration
 sample_rate = 44100 # in Hz
-duration = 3 # in seconds
-
-# Define the notes and their frequencies
-notes = {
-    'C4': 261.63,
-    'D4': 293.66,
-    'E4': 329.63,
-    'F4': 349.23,
-    'G4': 392.00,
-    'A4': 440.00,
-    'B4': 493.88,
-    'C5': 523.25
-}
+duration = 0.5 # in seconds
 
 # Define a function to generate a sawtooth wave for a given frequency
 def generate_sawtooth_wave(frequency, duration, sample_rate):
@@ -65,14 +53,15 @@ def generate_sine_wave(frequency, duration, sample_rate):
 
     return sine_wave
 
-# Generate the sawtooth, square, and sine waves for a given note
-note = 'C4'
-frequency = notes[note]
-sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
-square_wave = generate_square_wave(frequency, duration, sample_rate)
-sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+def play_notes(final_freqs):
 
-# Add the waveforms together and play using sounddevice
-combined_wave = sawtooth_wave + sine_wave + square_wave
-sd.play(combined_wave, sample_rate)
-sd.wait() # Wait until the waveform has finished playing
+    # Generate the sawtooth, square, and sine waves for a given note
+    for frequency in final_freqs:
+        sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
+        square_wave = generate_square_wave(frequency, duration, sample_rate)
+        sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+
+    # Add the waveforms together and play using sounddevice
+        combined_wave = sawtooth_wave + sine_wave + square_wave
+        sd.play(combined_wave, sample_rate)
+        sd.wait() # Wait until the waveform has finished playing
