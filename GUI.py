@@ -453,4 +453,4 @@ window()
 
 
 
-# komentarz
+# v 1.0

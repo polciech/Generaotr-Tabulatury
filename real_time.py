@@ -27,3 +27,5 @@ if __name__ == "__main__":
         for i in range(f_size):
             notes.append(f[i])
             print(notes)
+
+# v 1.0

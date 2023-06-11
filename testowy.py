@@ -227,3 +227,4 @@ def writing_to_txt_file(tabulature):
 
 
 
+# v 1.0

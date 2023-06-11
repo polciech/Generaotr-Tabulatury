@@ -121,3 +121,6 @@ def find_notes(audio_chunk):
                     final_freqs.append(item['freq'])
 
     return final_notes ,final_freqs
+
+
+# v 1.0
