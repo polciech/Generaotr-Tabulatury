@@ -6,7 +6,8 @@ from testowy import find_notes, creating_tab, writing_to_txt_file
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
-
+import time
+wybrane_strojenie = 0
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
@@ -307,13 +308,13 @@ class GUI(QMainWindow):
         if fileName:
             print("Selected file:", fileName)
         self.final_notes, self.final_freqs = find_notes(fileName)
-        writing_to_txt_file(creating_tab(self.final_notes))
+        writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
         self.play()
 
     def handle_selection_change(self, index):
-        # Get the selected option's ID
-        self.wybrane_strojenie = self.strojenia.currentData()
-        print(self.wybrane_strojenie)
+        wybrane_strojenie = self.strojenia.currentData()
+        print(wybrane_strojenie)
+        writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
 
     def record(self):
             
@@ -348,14 +349,14 @@ class GUI(QMainWindow):
         wf.writeframes(b''.join(frames))
         wf.close()
         self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
-        writing_to_txt_file(creating_tab(self.final_notes))
+        writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
         self.play()
 
     def play(self):
         
         # Set the sample rate and duration
         sample_rate = 44100 # in Hz
-        duration = 0.3 # in seconds
+        duration = 0.5 # in seconds
 
         # Define a function to generate a sawtooth wave for a given frequency
         def generate_sawtooth_wave(frequency, duration, sample_rate):
