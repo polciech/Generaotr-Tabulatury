@@ -111,11 +111,13 @@ def find_notes(audio_chunk):
 
                 final_dict.append(frame_dict)
 
+    final_freqs = []
     final_notes = []
     for i, item in enumerate(final_dict):
         if i > 1 and i < len(final_dict) - 2:
             if item['amp'] > AMP_THRESHOLD:
                 if item['amp'] > final_dict[i - 1]['amp'] and item['amp'] > final_dict[i + 1]['amp']:
                     final_notes.append(item['note'])
+                    final_freqs.append(item['freq'])
 
-    return final_notes
+    return final_notes ,final_freqs

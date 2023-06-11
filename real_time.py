@@ -17,13 +17,16 @@ if __name__ == "__main__":
     audio_buffer = AudioBuffer()
     audio_buffer.start()
     notes =[]
+    freqs =[]
     previous_note = None
 
 
     while True:
         audio_data = audio_buffer()
-        f = find_notes(audio_data)
-        f_size = len(f)
+        note, freq = find_notes(audio_data)
+        f_size = len(freq)
         for i in range(f_size):
-            notes.append(f[i])
+            freqs.append(freq[i])
+            notes.append(note[i])
             print(notes)
+            print(freqs)
