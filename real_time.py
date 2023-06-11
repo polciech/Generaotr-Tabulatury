@@ -26,7 +26,9 @@ if __name__ == "__main__":
         note, freq = find_notes(audio_data)
         f_size = len(freq)
         for i in range(f_size):
-            freqs.append(freq[i])
-            notes.append(note[i])
-            print(notes)
-            print(freqs)
+            if note[i] != previous_note:
+                freqs.append(freq[i])
+                notes.append(note[i])
+                print(notes)
+                print(freqs)
+                previous_note = note[i]
