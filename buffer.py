@@ -50,5 +50,3 @@ if __name__ == "__main__":
     audio_buffer = AudioBuffer()
     audio_buffer.start()
     print(audio_buffer().shape)
-
-# v 1.0

@@ -122,5 +122,3 @@ def find_notes(audio_chunk):
 
     return final_notes ,final_freqs
 
-
-# v 1.0

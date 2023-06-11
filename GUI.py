@@ -328,7 +328,6 @@ class GUI(QMainWindow):
         writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
 
     def record(self):
-        wybrane_strojenie = 0
         audio = pyaudio.PyAudio()
         stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
 
@@ -452,5 +451,3 @@ window()
 
 
 
-
-# v 1.0

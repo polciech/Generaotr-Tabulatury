@@ -226,5 +226,3 @@ def writing_to_txt_file(tabulature):
     tab.write(tabulature)
 
 
-
-# v 1.0

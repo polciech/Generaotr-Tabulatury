@@ -28,4 +28,3 @@ if __name__ == "__main__":
             notes.append(f[i])
             print(notes)
 
-# v 1.0
