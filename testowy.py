@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 import numpy as np
 import tqdm
+import os
 
 
 # Configuration
@@ -110,48 +111,103 @@ def find_notes(FILE_NAME):
         final_dict.append(frame_dict)
 
   final_notes=[]
+  final_freqs=[]
   for i,item in enumerate(final_dict):
    if i>1 and i<len(final_dict)-2:
      if item['amp']>AMP_THRESHOLD:
        if item['amp'] > final_dict[i-1]['amp'] and item['amp']>final_dict[i+1]['amp']:
          final_notes.append(item['note'])
-  return final_notes
+         final_freqs.append(item['freq'])
+  return final_notes, final_freqs
 
-def creating_tab(final_notes):
-  E4_row = ['E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5']
-  B3_row = ['B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4']
-  G3_row = ['G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4']
-  D3_row = ['D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4']
-  A2_row = ['A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3']
-  E2_row = ['E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3']
+nuty = ['D3', 'C3', 'G2', 'E5', 'A3']
 
-  row_table = [E4_row, B3_row, G3_row, D3_row, A2_row, E2_row]
+def creating_tab(final_notes, strojenie_index):
+  #NOTES_TABLE = ['E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5'
+  #              ,'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4'
+  #              ,'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4'
+  #              ,'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4'
+  #              ,'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3'
+  #              ,'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3']
+  
+  strojenie_lists = [['E4', 'B3', 'G3', 'D3', 'A2', 'E2'],  #Standardowy strój  0
+                     ['E4', 'B3', 'G3', 'D3', 'A2', 'D2'],  #Drop D             1
+                     ['D4', 'A3', 'G3', 'D3', 'A2', 'D2'],  #DADGAD             2
+                     ['D4', 'B3', 'G3', 'D3', 'A2', 'D2'],  #Double Drop D      3
+                     ['C4', 'C4', 'G3', 'D3', 'A2', 'D2'],  #D7sus4             4
+                     ['D4', 'A3', 'F#3', 'D3', 'A2', 'D2'], #Open D Major       5
+                     ['E4', 'C4', 'F3', 'C3', 'D2', 'C2'],  #Cmaj9sus4          6
+                     ['A#3', 'F3', 'E3', 'A#2', 'G2', 'C2'],#Cmaj7sus4          7
+                     ['F4', 'C4', 'G3', 'C3', 'G2', 'C2'],  #Csus4              8
+                     ['E4', 'A3', 'E3', 'C#3', 'A2', 'E2'], #Open A Major       9
+                     ['E4', 'B3', 'G#3', 'E3', 'B2', 'E2'], #Open E Major       10
+                     ['E4', 'A3', 'G3', 'E3', 'B2', 'E2'],  #E Minor Sus4       11
+                     ['E4', 'A3', 'E3', 'D3', 'A2', 'E2'],  #Double E Double A  12
+                     ['D4', 'B3', 'G3', 'D3', 'G2', 'D2']]  #Open G Major       13
 
+  NOTES_TABLE = ['C2', 'C#2', 'D2', 'D#2','E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3',
+                'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 
+                'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5']  
+
+  row_0 = []
+  row_1 = []
+  row_2 = []
+  row_3 = []
+  row_4 = []
+  row_5 = []
+
+  row_table = [row_0, row_1, row_2, row_3, row_4, row_5]
+  
+  #creating lines that will be summed as tab
+  SN_1 = '|--'
+  SN_2 = '|--'
+  SN_3 = '|--'
+  SN_4 = '|--'
+  SN_5 = '|--'
+  SN_6 = '|--'
+  final_tab_table = [SN_1, SN_2, SN_3, SN_4, SN_5, SN_6]
+  
+  for STARTING_NOTE in strojenie_lists[strojenie_index]:
+    row_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = NOTES_TABLE[NOTES_TABLE.index(STARTING_NOTE): NOTES_TABLE.index(STARTING_NOTE)+13]
+    if len(STARTING_NOTE) > 2:
+      final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = STARTING_NOTE + final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)]
+    else:
+      final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = ' ' + STARTING_NOTE + final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)]
+      
+      
   final_tab = ''
-  dict_of_tuples = []
+  table_of_tables = []
 
-  #creating dict_of_tuples with ordered note names with number of string that they can be played on
+  #creating table_of_tables with ordered note names with number of string that they can be played on
   for note in final_notes:
     for i in range(0,6):
       if note in row_table[i]:
-        dict_of_tuples.append((note, i))
+        table_of_tables.append([note, i, row_table[i].index(note)])
         break
-
-  #creating lines that will be summed as tab
-  E4 = 'E4|--'
-  B3 = 'B3|--'
-  G3 = 'G3|--'
-  D3 = 'D3|--'
-  A2 = 'A2|--'
-  E2 = 'E2|--'
-  final_tab_table = [E4, B3, G3, D3, A2, E2]
-
-  for tup in dict_of_tuples:
-    final_tab_table[tup[1]] = final_tab_table[tup[1]] + str(row_table[tup[1]].index(tup[0])) + '--'
+  
+  
+  #correcting function
+  for tab in table_of_tables:
     for i in range(0, 6):
-      if i != tup[1]:
-        final_tab_table[i] = final_tab_table[i] + '---'
+      if table_of_tables.index(tab) == 0:
+        continue
+      else:
+        if tab[0] in row_table[i]:
+          if abs(tab[2] - table_of_tables[table_of_tables.index(tab)-1][2]) > abs(row_table[i].index(tab[0]) - table_of_tables[table_of_tables.index(tab)-1][2]):
+            tab[1] = i
+            tab[2] = row_table[i].index(tab[0])
+          
+  
+  for tab in table_of_tables:
+    final_tab_table[tab[1]] = final_tab_table[tab[1]] + str(tab[2]) + '--'
+    for i in range(0, 6):
+      if i != tab[1]:
+        if (tab[2]>9):
+          final_tab_table[i] = final_tab_table[i] + '----'
+        else:
+          final_tab_table[i]=final_tab_table[i] + '---'
 
+  
   #summing lines to tab
   for line in final_tab_table:
     final_tab = final_tab + line + '\n'
@@ -161,7 +217,14 @@ def creating_tab(final_notes):
   return final_tab
 
 def writing_to_txt_file(tabulature):
-  with open('tab.txt', 'w') as tab:
+  exists = True
+  # i = 1
+  # while os.path.exists(f'tabs/tab{i}.txt'):
+  #   i+=1
+
+  with open(f'tab.txt', 'w') as tab:
     tab.write(tabulature)
 
-#writing_to_txt_file(creating_tab(final_notes))
+
+
+# v 1.0
