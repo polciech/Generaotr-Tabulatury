@@ -225,5 +225,5 @@ def writing_to_txt_file(tabulature):
   with open(f'tab.txt', 'w') as tab:
     tab.write(tabulature)
 
-print(creating_tab(nuty, 0))
+
 

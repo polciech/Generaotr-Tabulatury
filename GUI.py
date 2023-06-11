@@ -7,6 +7,8 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 import time
+import rt_process
+from buffer import AudioBuffer
 wybrane_strojenie = 0
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -282,7 +284,7 @@ class GUI(QMainWindow):
         if path == self.filepath:
             self.file.seek(0)
             self.tab.setText(self.file.readAll().data().decode('utf-8'))
-            self.scrollTab.horizontalScrollBar().setValue(self.scrollTab.horizontalScrollBar().maximum())
+            # self.scrollTab.horizontalScrollBar().setValue(self.scrollTab.horizontalScrollBar().maximum())
 
     def click(self):
         if self.isrecording:
@@ -304,12 +306,21 @@ class GUI(QMainWindow):
 
     def load(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Wave Files (recording*.wav)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(self, "Load File", "", "Txt Files (data*.txt)", options=options)
         if fileName:
             print("Selected file:", fileName)
-        self.final_notes, self.final_freqs = find_notes(fileName)
-        writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
-        self.play()
+
+        self.final_notes = []
+        self.final_freqs = []
+
+        with open(fileName, 'r') as file:
+            lines = file.readlines()
+            if len(lines) >= 1:
+                self.final_notes.extend((lines[0].strip()).split())
+            if len(lines) >= 2:
+                self.final_freqs.extend((lines[1].strip()).split())
+            writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
+            self.play()
 
     def handle_selection_change(self, index):
         wybrane_strojenie = self.strojenia.currentData()
@@ -317,46 +328,53 @@ class GUI(QMainWindow):
         writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
 
     def record(self):
-            
+        wybrane_strojenie = 0
         audio = pyaudio.PyAudio()
         stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
 
         frames = []
 
+        audio_buffer = AudioBuffer()
+        audio_buffer.start()
+        self.final_notes =[]
+        self.final_freqs = []
+        previous_note = None
+
         while self.isrecording:
-            data = stream.read(CHUNK)
-            frames.append(data)
-
-        sample_width = audio.get_sample_size(FORMAT)
-
-        #zamykanie sesji nagrywania
-        stream.stop_stream()
-        stream.close()
-        audio.terminate()
-
+            audio_data = audio_buffer()
+            note, freq= rt_process.find_notes(audio_data)
+            f_size = len(note)
+            for i in range(f_size):
+                if note[i] != previous_note:
+                    self.final_freqs.append(freq[i])
+                    self.final_notes.append(note[i])
+                    previous_note = note[i]
+                    writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
+        
         exists = True
         i = 1
         while exists :
-            if os.path.exists(f"recording{i}.wav"):
+            if os.path.exists(f"data{i}.txt"):
                 i += 1
             else:
                 exists = False
 
-        wf = wave.open(f"recording{i}.wav", 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(sample_width)
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-        wf.close()
-        self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
-        writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
+        with open(f"data{i}.txt", 'w') as file:
+            if self.final_notes:
+                for i in self.final_notes:
+                    file.write(str(i) + ' ')
+                file.write('\n')
+            if self.final_freqs:
+                for i in self.final_freqs:
+                    file.write(str(i) + ' ')
+
         self.play()
 
     def play(self):
         
         # Set the sample rate and duration
         sample_rate = 44100 # in Hz
-        duration = 0.5 # in seconds
+        duration = 0.3 # in seconds
 
         # Define a function to generate a sawtooth wave for a given frequency
         def generate_sawtooth_wave(frequency, duration, sample_rate):
