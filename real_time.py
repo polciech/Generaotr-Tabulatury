@@ -1,6 +1,7 @@
 import pyaudio
 import numpy as np
-from rt import find_notes
+from buffer import AudioBuffer
+from rt_process import find_notes
 
 # Configuration
 CHUNK = 1024
@@ -12,27 +13,17 @@ RATE = 44100
 audio = pyaudio.PyAudio()
 freqs=[]
 
-# Open audio stream
-stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
+if __name__ == "__main__":
+    audio_buffer = AudioBuffer()
+    audio_buffer.start()
+    notes =[]
+    previous_note = None
 
-# Start the stream
-stream.start_stream()
 
-try:
     while True:
-        # Read audio data from the stream
-        data = stream.read(CHUNK)
-
-        # Convert the audio data to numpy array
-        audio_np = np.frombuffer(data, dtype=np.int16)
-
-        # Process the audio frame using the find_notes function
-        final_freqs = find_notes(audio_np, RATE)
-        # Do something with the final_notes and final_freqs
-
-
-except KeyboardInterrupt:
-    # Stop the stream when interrupted
-    stream.stop_stream()
-    stream.close()
-    audio.terminate()
+        audio_data = audio_buffer()
+        f = find_notes(audio_data)
+        f_size = len(f)
+        for i in range(f_size):
+            notes.append(f[i])
+            print(notes)
