@@ -167,12 +167,13 @@ def creating_tab(final_notes, strojenie_index):
   SN_6 = '|--'
   final_tab_table = [SN_1, SN_2, SN_3, SN_4, SN_5, SN_6]
   
-  for i in range(0,6):
-    row_table[i] = NOTES_TABLE[NOTES_TABLE.index(strojenie_lists[strojenie_index][i]): NOTES_TABLE.index(strojenie_lists[strojenie_index][i])+13]
-    if len(strojenie_lists[strojenie_index][i]) > 2:
-      final_tab_table[i] = strojenie_lists[strojenie_index][i] + final_tab_table[i]
+  for STARTING_NOTE in strojenie_lists[strojenie_index]:
+    row_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = NOTES_TABLE[NOTES_TABLE.index(STARTING_NOTE): NOTES_TABLE.index(STARTING_NOTE)+13]
+    if len(STARTING_NOTE) > 2:
+      final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = STARTING_NOTE + final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)]
     else:
-      final_tab_table[i] = ' ' + strojenie_lists[strojenie_index][i] + final_tab_table[i]      
+      final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)] = ' ' + STARTING_NOTE + final_tab_table[strojenie_lists[strojenie_index].index(STARTING_NOTE)]
+      
       
   final_tab = ''
   table_of_tables = []

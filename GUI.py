@@ -9,6 +9,9 @@ import soundfile as sf
 import time
 import rt_process
 from buffer import AudioBuffer
+
+
+
 wybrane_strojenie = 0
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -27,6 +30,11 @@ class GUI(QMainWindow):
         self.setGeometry(0,0,1920,1080)
         self.showMaximized()
         self.isrecording = False
+        self.isplaying = False
+        self.PLAY_ICON = 'play.png'
+        self.PLAY_ICON_UNHOVERED = 'play_unhovered.png'
+        self.REC = 'microphone_hovered.png'
+        self.REC_UNHOVERED = 'microphone_unhovered.png'
 
     def initUI(self):
     
@@ -129,20 +137,20 @@ class GUI(QMainWindow):
         self.change_button.setMaximumWidth(50)
 
         self.record_button.setMouseTracking(True)
-        self.record_button.enterEvent = lambda event: self.record_button.setIcon(QIcon('microphone_hovered.png'))
-        self.record_button.leaveEvent = lambda event: self.record_button.setIcon(QIcon('microphone_unhovered.png'))
+        self.record_button.enterEvent = lambda event: self.record_button.setIcon(QIcon(self.REC))
+        self.record_button.leaveEvent = lambda event: self.record_button.setIcon(QIcon(self.REC_UNHOVERED))
 
         self.load_button.setMouseTracking(True)
         self.load_button.enterEvent = lambda event: self.load_button.setIcon(QIcon('load.png'))
         self.load_button.leaveEvent = lambda event: self.load_button.setIcon(QIcon('load_unhovered.png'))
 
         self.change_button.setMouseTracking(True)
-        self.change_button.enterEvent = lambda event: self.change_button.setIcon(QIcon('plus.png'))
-        self.change_button.leaveEvent = lambda event: self.change_button.setIcon(QIcon('plus_unhovered.png'))
+        self.change_button.enterEvent = lambda event: self.change_button.setIcon(QIcon(self.PLAY_ICON))
+        self.change_button.leaveEvent = lambda event: self.change_button.setIcon(QIcon(self.PLAY_ICON_UNHOVERED))
 
         self.play_button.setMouseTracking(True)
-        self.play_button.enterEvent = lambda event: self.play_button.setIcon(QIcon('play.png'))
-        self.play_button.leaveEvent = lambda event: self.play_button.setIcon(QIcon('play_unhovered.png'))
+        self.play_button.enterEvent = lambda event: self.play_button.setIcon(QIcon(self.PLAY_ICON))
+        self.play_button.leaveEvent = lambda event: self.play_button.setIcon(QIcon(self.PLAY_ICON_UNHOVERED))
 
         # Create a dropdown list
         self.dropdown = QComboBox(self)
@@ -289,9 +297,13 @@ class GUI(QMainWindow):
     def click(self):
         if self.isrecording:
             self.isrecording = False
+            self.REC = 'microphone_hovered.png'
+            self.REC_UNHOVERED = 'microphone_unhovered.png'
         else:
             self.isrecording = True
             threading.Thread(target=self.record).start()
+            self.REC = 'microphone_record.png'
+            self.REC_UNHOVERED = 'microphone_record_unhovered.png'
 
 
     def update_list(self):
@@ -320,7 +332,8 @@ class GUI(QMainWindow):
             if len(lines) >= 2:
                 self.final_freqs.extend((lines[1].strip()).split())
             writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
-            self.play()
+
+        self.play()
 
     def handle_selection_change(self, index):
         wybrane_strojenie = self.strojenia.currentData()
@@ -366,6 +379,19 @@ class GUI(QMainWindow):
             if self.final_freqs:
                 for i in self.final_freqs:
                     file.write(str(i) + ' ')
+
+        
+        exists = True
+        i = 1
+        while exists :
+            if os.path.exists(f"tab{i}.txt"):
+                i += 1
+            else:
+                exists = False
+
+        with open(f"tab{i}.txt", 'w') as file_tab:
+            file_tab.write(creating_tab(self.final_notes, wybrane_strojenie))
+
 
         self.play()
 
@@ -426,9 +452,9 @@ class GUI(QMainWindow):
         sound = np.array([])
         # Generate the sawtooth, square, and sine waves for a given note
         for frequency in self.final_freqs:
-            sawtooth_wave = generate_sawtooth_wave(frequency, duration, sample_rate)
-            square_wave = generate_square_wave(frequency, duration, sample_rate)
-            sine_wave = generate_sine_wave(frequency, duration, sample_rate)
+            sawtooth_wave = generate_sawtooth_wave(float(frequency), duration, sample_rate)
+            square_wave = generate_square_wave(float(frequency), duration, sample_rate)
+            sine_wave = generate_sine_wave(float(frequency), duration, sample_rate)
             combined_wave = sawtooth_wave + sine_wave
             sound = np.concatenate((sound, combined_wave))
         
@@ -436,8 +462,19 @@ class GUI(QMainWindow):
         sf.write(output_play, sound, sample_rate)
 
     def play_sound(self):
-        audio_data, _ = sf.read("play.wav")
-        sd.play(audio_data, 44100)
+        if self.isplaying:
+            self.isplaying = False
+            sd.stop()
+            self.PLAY_ICON = 'play.png'
+            self.PLAY_ICON_UNHOVERED = 'play_unhovered.png'
+            
+        else:
+            self.isplaying = True
+            audio_data, _ = sf.read("play.wav")
+            sd.play(audio_data, 44100)
+            self.PLAY_ICON = 'stop.png'
+            self.PLAY_ICON_UNHOVERED = 'stop_unhovered.png'
+            
 
 def window ():
     app = QApplication(sys.argv)
