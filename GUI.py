@@ -9,7 +9,8 @@ import soundfile as sf
 import time
 import rt_process
 from buffer import AudioBuffer
-
+import crepe
+from scipy.io import wavfile
 
 
 wybrane_strojenie = 0
@@ -35,7 +36,7 @@ class GUI(QMainWindow):
         self.PLAY_ICON_UNHOVERED = 'play_unhovered.png'
         self.REC = 'microphone_hovered.png'
         self.REC_UNHOVERED = 'microphone_unhovered.png'
-
+        self.input_id = 0
     def initUI(self):
     
     #Titlebar: title, minimize, maximize, close
@@ -370,6 +371,16 @@ class GUI(QMainWindow):
                     previous_note = note[i]
                     writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
         
+        # def detect_pitch_crepe(filename):
+        #     sr,audio = wavfile.read(filename)
+        #     time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
+        #     return time, frequency, confidence
+        
+        # time, frequency, confidence = detect_pitch_crepe('recording1.wav')
+        # print("Time: ", time)
+        # print("Frequency: ", frequency)
+        # print("Confidences: ", confidence)
+
         exists = True
         i = 1
         while exists :
