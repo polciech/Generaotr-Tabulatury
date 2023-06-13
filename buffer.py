@@ -6,11 +6,11 @@ from time import sleep
 
 
 class AudioBuffer:
-
     RATE = 44100
     CHUNK = int(RATE / 10)
 
     def __init__(self, chunks: int = 5) -> None:
+        self.input_id = None
         self.chunks = chunks
         self.stream = pyaudio.PyAudio().open(
             format=pyaudio.paInt16,
@@ -18,9 +18,13 @@ class AudioBuffer:
             rate=self.RATE,
             input=True,
             frames_per_buffer=self.CHUNK,
+            input_device_index=self.input_id
             )
         self.thread = threading.Thread(target=self._collect_data, daemon=True)
         self.frames = deque(maxlen=self.chunks)
+
+    def setInput_id(self, input_id):
+        self.input_id = input_id
 
     def __call__(self):
         return np.concatenate(self.frames)

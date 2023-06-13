@@ -163,6 +163,7 @@ class GUI(QMainWindow):
         for i in range(0, numdevices):
             if (audio.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
                 self.dropdown.addItem(audio.get_device_info_by_host_api_device_index(0, i).get('name'))
+        
 
         self.dropdown.setStyleSheet("background-color: #464646; border-radius: 5px; border-style: none; color: white;")
         self.dropdown.setFixedWidth(175)
@@ -313,7 +314,6 @@ class GUI(QMainWindow):
 
 
     def update_list(self):
-        self.dropdown.setText(self.dropdown.currentText())
         self.input_id = self.dropdown.currentIndex()-1
 
     def minmax(self):
@@ -354,6 +354,7 @@ class GUI(QMainWindow):
 
         audio_buffer = AudioBuffer()
         audio_buffer.start()
+        audio_buffer.setInput_id(self.input_id)
         self.final_notes =[]
         self.final_freqs = []
         previous_note = None
