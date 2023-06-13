@@ -59,7 +59,7 @@ class GUI(QMainWindow):
         self.minimize.setFixedSize(40,25)
         self.maximize.setFixedSize(40,25)
         
-        self.close_button.clicked.connect(self.close)
+        self.close_button.clicked.connect(self.close_everything)
         self.minimize.clicked.connect(self.showMinimized)
         self.maximize.clicked.connect(self.minmax)
 
@@ -287,7 +287,13 @@ class GUI(QMainWindow):
         self.watcher.fileChanged.connect(self.on_file_changed)
         
 
+
+
     @Slot(str)
+    def close_everything(self):
+        self.isrecording=False
+        self.close()
+
     def on_file_changed(self, path):
         if path == self.filepath:
             self.file.seek(0)
