@@ -12,6 +12,7 @@ from buffer import AudioBuffer
 import crepe
 from scipy.io import wavfile
 import math
+import librosa
 
 wybrane_strojenie = 0
 CHUNK = 1024
@@ -410,23 +411,13 @@ class GUI(QMainWindow):
         def detect_pitch_crepe(filename):
             sr,audio = wavfile.read(filename)
 
-            def freq_to_midi(frequency):
-                midi_number = 69 + 12 * math.log2(frequency / 220)
-                return round(midi_number)
-
-            def midi_to_note_octave(midi_number):
-                notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-                note_index = midi_number % 12
-                octave = (midi_number // 12) - 1
-                note = notes[note_index]
-                return note + str(octave)
 
             time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
 
             notes =[]
             for freq in frequency:
-                midi = freq_to_midi(freq)
-                note = midi_to_note_octave(midi)
+                midi = librosa.hz_to_midi(freq)
+                note = librosa.midi_to_note(midi)
                 notes.append(note)
 
         
