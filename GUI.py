@@ -382,7 +382,7 @@ class GUI(QMainWindow):
         wf.writeframes(b''.join(frames))
         wf.close()
 
-        self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
+        # self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
 
         # audio = pyaudio.PyAudio()
         # stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
@@ -429,8 +429,9 @@ class GUI(QMainWindow):
                 note = midi_to_note_octave(midi)
                 notes.append(note)
 
+            return notes
         
-
+        self.final_notes = detect_pitch_crepe(f'recording{i}.wav')
 
         # def frequencies_to_notes(frequencies):
         #     notes = []
