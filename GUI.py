@@ -407,69 +407,9 @@ class GUI(QMainWindow):
                     self.final_notes.append(note[i])
                     previous_note = note[i]
                     writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
+        print(self.final_notes)
+        audio_buffer.stop()
         
-        # def detect_pitch_crepe(filename):
-        #     sr,audio = wavfile.read(filename)
-
-<<<<<<< HEAD
-
-            time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
-
-            notes =[]
-            for freq in frequency:
-                midi = librosa.hz_to_midi(freq)
-                note = librosa.midi_to_note(midi)
-                notes.append(note)
-=======
-        #     def freq_to_midi(frequency):
-        #         midi_number = 69 + 12 * math.log2(frequency / 220)
-        #         return round(midi_number)
-
-        #     def midi_to_note_octave(midi_number):
-        #         notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-        #         note_index = midi_number % 12
-        #         octave = (midi_number // 12) - 1
-        #         note = notes[note_index]
-        #         return note + str(octave)
-
-        #     time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
-        #     previousNote = None
-        #     notes =[]
-        #     for freq in frequency:
-        #         midi = freq_to_midi(freq)
-        #         note = midi_to_note_octave(midi)
-        #         if note != previousNote:
-        #             notes.append(note)
-        #             previousNote = note
->>>>>>> 38ba3076f6f89109c09abf7b751fa8332862cd64
-
-        #     return notes
-        
-        # self.final_notes = detect_pitch_crepe(f'recording{i}.wav')
-
-        # def frequencies_to_notes(frequencies):
-        #     notes = []
-    
-        #     for frequency in frequencies:
-        #         note = ""
-        #         semitones_above_a4 = int(round(12 * (math.log2(frequency / 440))))
-        
-        #         octave = 4 + (semitones_above_a4 // 12)
-        
-        #         if octave < 0:
-        #             note += "-" * abs(octave)
-        #         elif octave > 0:
-        #             note += "+" * octave
-        
-        #         note += NOTES[semitones_above_a4 % 12]
-        #         notes.append(note)
-        #     return notes
-
-        # # Mapping of semitones above A4 to note names
-        # NOTES = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-
-        # self.final_notes = frequencies_to_notes(frequency)
-        # self.final_freqs = frequency
         # exists = True
         # i = 1
         # while exists :

@@ -6,6 +6,7 @@ import numpy as np
 import numpy as np
 import tqdm
 import os
+import librosa
 
 
 # Configuration
@@ -58,14 +59,14 @@ def find_notes(FILE_NAME):
     while( (idx<len(lst)) and (len(found)<num) ):
       f = xf[lst[idx][0]]
       y = lst[idx][1]
-      n = freq_to_number(f)
+      n = librosa.hz_to_midi(f)
       if np.isfinite(n):
         n0 = int(round(n))
-        name = note_name(n0)
+        name = librosa.midi_to_note(n0)
 
         if name not in found_note:
           found_note.add(name)
-          s = [f,note_name(n0),y]
+          s = [f, name, y]
           found.append(s)
       idx += 1
 
@@ -131,24 +132,24 @@ def creating_tab(final_notes, strojenie_index):
   #              ,'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3'
   #              ,'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3']
   
-  strojenie_lists = [['E4', 'B3', 'G3', 'D3', 'A2', 'E2'],  #Standardowy strój  0
-                     ['E4', 'B3', 'G3', 'D3', 'A2', 'D2'],  #Drop D             1
-                     ['D4', 'A3', 'G3', 'D3', 'A2', 'D2'],  #DADGAD             2
-                     ['D4', 'B3', 'G3', 'D3', 'A2', 'D2'],  #Double Drop D      3
-                     ['C4', 'C4', 'G3', 'D3', 'A2', 'D2'],  #D7sus4             4
-                     ['D4', 'A3', 'F#3', 'D3', 'A2', 'D2'], #Open D Major       5
-                     ['E4', 'C4', 'F3', 'C3', 'D2', 'C2'],  #Cmaj9sus4          6
-                     ['A#3', 'F3', 'E3', 'A#2', 'G2', 'C2'],#Cmaj7sus4          7
-                     ['F4', 'C4', 'G3', 'C3', 'G2', 'C2'],  #Csus4              8
-                     ['E4', 'A3', 'E3', 'C#3', 'A2', 'E2'], #Open A Major       9
-                     ['E4', 'B3', 'G#3', 'E3', 'B2', 'E2'], #Open E Major       10
-                     ['E4', 'A3', 'G3', 'E3', 'B2', 'E2'],  #E Minor Sus4       11
-                     ['E4', 'A3', 'E3', 'D3', 'A2', 'E2'],  #Double E Double A  12
-                     ['D4', 'B3', 'G3', 'D3', 'G2', 'D2']]  #Open G Major       13
+  strojenie_lists = [['E5', 'B4', 'G4', 'D4', 'A3', 'E3'],  #Standardowy strój  0
+                     ['E5', 'B4', 'G4', 'D4', 'A3', 'D3'],  #Drop D             1
+                     ['D5', 'A4', 'G4', 'D4', 'A3', 'D3'],  #DADGAD             2
+                     ['D5', 'B4', 'G4', 'D4', 'A3', 'D3'],  #Double Drop D      3
+                     ['C5', 'C5', 'G4', 'D4', 'A3', 'D3'],  #D7sus4             4
+                     ['D5', 'A4', 'F#4', 'D4', 'A3', 'D3'], #Open D Major       5
+                     ['E5', 'C4', 'F4', 'C4', 'D3', 'C3'],  #Cmaj9sus4          6
+                     ['A#4', 'F4', 'E4', 'A#3', 'G3', 'C3'],#Cmaj7sus4          7
+                     ['F5', 'C4', 'G4', 'C4', 'G3', 'C3'],  #Csus4              8
+                     ['E5', 'A4', 'E4', 'C#4', 'A3', 'E3'], #Open A Major       9
+                     ['E5', 'B4', 'G#4', 'E4', 'B3', 'E3'], #Open E Major       10
+                     ['E5', 'A4', 'G4', 'E4', 'B3', 'E3'],  #E Minor Sus4       11
+                     ['E5', 'A4', 'E4', 'D4', 'A3', 'E3'],  #Double E Double A  12
+                     ['D5', 'B4', 'G4', 'D4', 'G3', 'D3']]  #Open G Major       13
 
   NOTES_TABLE = ['C2', 'C#2', 'D2', 'D#2','E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3',
                 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 
-                'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5']  
+                'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5', 'C6', 'C#6', 'D6', 'D#6', 'E6', 'F6']  
 
   row_0 = []
   row_1 = []

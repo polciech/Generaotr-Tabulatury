@@ -9,7 +9,7 @@ import librosa
 
 # Configuration
 FPS = 30
-FFT_WINDOW_SECONDS = 0.25  # how many seconds of audio make up an FFT window
+FFT_WINDOW_SECONDS = 0.3  # how many seconds of audio make up an FFT window
 AMP_THRESHOLD = 0.1
 DIFF_THRESHOLD = 0.1
 
@@ -59,39 +59,22 @@ def find_notes(audio_chunk):
         while (idx < len(lst)) and (len(found) < num):
             f = xf[lst[idx][0]]
             y = lst[idx][1]
-<<<<<<< HEAD
             n = librosa.hz_to_midi(f)
-            n0 = int(round(n))
-            name = librosa.midi_to_note(n0)
-
-            if name not in found_note:
-                found_note.add(name)
-                s = [f, name, y]
-                found.append(s)
-=======
-            n = freq_to_number(f)
             if np.isfinite(n):
                 n0 = int(round(n))
-                name = note_name(n0)
+                name = librosa.midi_to_note(n0)
 
                 if name not in found_note:
                     found_note.add(name)
-                    s = [f, note_name(n0), y]
+                    s = [f, name, y]
                     found.append(s)
->>>>>>> 38ba3076f6f89109c09abf7b751fa8332862cd64
             idx += 1
 
         return found
 
-<<<<<<< HEAD
     # def freq_to_number(f): return 69 + 12 * np.log2(f / 220.0)
     # def number_to_freq(n): return 220 * 2.0 ** ((n - 69) / 12.0)
     # def note_name(n): return NOTE_NAMES[n % 12] + str(int(n / 12 - 2))
-=======
-    def freq_to_number(f): return 69 + 12 * np.log2(f / 440.0)
-    def number_to_freq(n): return 220 * 2.0 ** ((n - 69) / 12.0)
-    def note_name(n): return NOTE_NAMES[n % 12] + str(int(n / 12 - 2))
->>>>>>> 38ba3076f6f89109c09abf7b751fa8332862cd64
 
     # Hanning window function
     window = 0.5 * (1 - np.cos(np.linspace(0, 2 * np.pi, FFT_WINDOW_SIZE, False)))
