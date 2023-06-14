@@ -349,68 +349,69 @@ class GUI(QMainWindow):
         writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
 
     def record(self):
-        audio = pyaudio.PyAudio()
-        stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True)
-        print('starting recording')
-
-        frames = []
-
-
-        while self.isrecording:
-            data = stream.read(CHUNK)
-            frames.append(data)
-
-        sample_width = audio.get_sample_size(FORMAT)
-
-        #zamykanie sesji nagrywania
-        stream.stop_stream()
-        stream.close()
-        audio.terminate()
-
-        exists = True
-        i = 1
-
-        while exists :
-            if os.path.exists(f"recording{i}.wav"):
-                i += 1
-            else:
-                exists = False
-
-        wf = wave.open(f"recording{i}.wav", 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(sample_width)
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-        wf.close()
-
-        self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
-
         # audio = pyaudio.PyAudio()
-        # stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
+        # stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True)
+        # print('starting recording')
 
         # frames = []
 
-        # audio_buffer = AudioBuffer()
-        # audio_buffer.start()
-        # audio_buffer.setInput_id(self.input_id)
-        # self.final_notes =[]
-        # self.final_freqs = []
-        # previous_note = None
 
         # while self.isrecording:
-        #     audio_data = audio_buffer()
-        #     note, freq= rt_process.find_notes(audio_data)
-        #     f_size = len(note)
-        #     for i in range(f_size):
-        #         if note[i] != previous_note:
-        #             self.final_freqs.append(freq[i])
-        #             self.final_notes.append(note[i])
-        #             previous_note = note[i]
-        #             writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
-        
-        def detect_pitch_crepe(filename):
-            sr,audio = wavfile.read(filename)
+        #     data = stream.read(CHUNK)
+        #     frames.append(data)
 
+        # sample_width = audio.get_sample_size(FORMAT)
+
+        # #zamykanie sesji nagrywania
+        # stream.stop_stream()
+        # stream.close()
+        # audio.terminate()
+
+        # exists = True
+        # i = 1
+
+        # while exists :
+        #     if os.path.exists(f"recording{i}.wav"):
+        #         i += 1
+        #     else:
+        #         exists = False
+
+        # wf = wave.open(f"recording{i}.wav", 'wb')
+        # wf.setnchannels(CHANNELS)
+        # wf.setsampwidth(sample_width)
+        # wf.setframerate(RATE)
+        # wf.writeframes(b''.join(frames))
+        # wf.close()
+
+        # self.final_notes, self.final_freqs = find_notes(f"recording{i}.wav")
+
+        audio = pyaudio.PyAudio()
+        stream = audio.open(format= FORMAT, channels=CHANNELS,rate= RATE, frames_per_buffer= CHUNK,input= True, input_device_index=input_id)
+
+        frames = []
+
+        audio_buffer = AudioBuffer()
+        audio_buffer.start()
+        audio_buffer.setInput_id(self.input_id)
+        self.final_notes =[]
+        self.final_freqs = []
+        previous_note = None
+
+        while self.isrecording:
+            audio_data = audio_buffer()
+            note, freq= rt_process.find_notes(audio_data)
+            f_size = len(note)
+            for i in range(f_size):
+                if note[i] != previous_note:
+                    self.final_freqs.append(freq[i])
+                    self.final_notes.append(note[i])
+                    previous_note = note[i]
+                    writing_to_txt_file(creating_tab(self.final_notes, wybrane_strojenie))
+        
+        # def detect_pitch_crepe(filename):
+        #     sr,audio = wavfile.read(filename)
+
+<<<<<<< HEAD
 
             time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
 
@@ -419,9 +420,32 @@ class GUI(QMainWindow):
                 midi = librosa.hz_to_midi(freq)
                 note = librosa.midi_to_note(midi)
                 notes.append(note)
+=======
+        #     def freq_to_midi(frequency):
+        #         midi_number = 69 + 12 * math.log2(frequency / 220)
+        #         return round(midi_number)
 
+        #     def midi_to_note_octave(midi_number):
+        #         notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        #         note_index = midi_number % 12
+        #         octave = (midi_number // 12) - 1
+        #         note = notes[note_index]
+        #         return note + str(octave)
+
+        #     time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
+        #     previousNote = None
+        #     notes =[]
+        #     for freq in frequency:
+        #         midi = freq_to_midi(freq)
+        #         note = midi_to_note_octave(midi)
+        #         if note != previousNote:
+        #             notes.append(note)
+        #             previousNote = note
+>>>>>>> 38ba3076f6f89109c09abf7b751fa8332862cd64
+
+        #     return notes
         
-
+        # self.final_notes = detect_pitch_crepe(f'recording{i}.wav')
 
         # def frequencies_to_notes(frequencies):
         #     notes = []
@@ -479,7 +503,7 @@ class GUI(QMainWindow):
             file_tab.write(creating_tab(self.final_notes, wybrane_strojenie))
 
 
-        self.play()
+        # self.play()
 
     def play(self):
         
