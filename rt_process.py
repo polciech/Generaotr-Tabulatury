@@ -59,18 +59,19 @@ def find_notes(audio_chunk):
             f = xf[lst[idx][0]]
             y = lst[idx][1]
             n = freq_to_number(f)
-            n0 = int(round(n))
-            name = note_name(n0)
+            if np.isfinite(n):
+                n0 = int(round(n))
+                name = note_name(n0)
 
-            if name not in found_note:
-                found_note.add(name)
-                s = [f, note_name(n0), y]
-                found.append(s)
+                if name not in found_note:
+                    found_note.add(name)
+                    s = [f, note_name(n0), y]
+                    found.append(s)
             idx += 1
 
         return found
 
-    def freq_to_number(f): return 69 + 12 * np.log2(f / 220.0)
+    def freq_to_number(f): return 69 + 12 * np.log2(f / 440.0)
     def number_to_freq(n): return 220 * 2.0 ** ((n - 69) / 12.0)
     def note_name(n): return NOTE_NAMES[n % 12] + str(int(n / 12 - 2))
 

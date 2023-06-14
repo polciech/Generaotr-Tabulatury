@@ -59,13 +59,14 @@ def find_notes(FILE_NAME):
       f = xf[lst[idx][0]]
       y = lst[idx][1]
       n = freq_to_number(f)
-      n0 = int(round(n))
-      name = note_name(n0)
+      if np.isfinite(n):
+        n0 = int(round(n))
+        name = note_name(n0)
 
-      if name not in found_note:
-        found_note.add(name)
-        s = [f,note_name(n0),y]
-        found.append(s)
+        if name not in found_note:
+          found_note.add(name)
+          s = [f,note_name(n0),y]
+          found.append(s)
       idx += 1
 
     return found
