@@ -10,12 +10,12 @@ import os
 
 # Configuration
 FPS = 30
-FFT_WINDOW_SECONDS = 0.25 # how many seconds of audio make up an FFT window
+FFT_WINDOW_SECONDS = 0.7 # how many seconds of audio make up an FFT window
 AMP_THRESHOLD = 0.1
 DIFF_THRESHOLD = 0.1
 
 # Note range to display
-FREQ_MIN = 10
+FREQ_MIN = 0
 FREQ_MAX = 1000
 
 # Notes to display
