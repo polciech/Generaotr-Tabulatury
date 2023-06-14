@@ -409,13 +409,25 @@ class GUI(QMainWindow):
         
         def detect_pitch_crepe(filename):
             sr,audio = wavfile.read(filename)
+
+            def freq_to_midi(frequency):
+                midi_number = 69 + 12 * math.log2(frequency / 220)
+                return round(midi_number)
+
+            def midi_to_note_octave(midi_number):
+                notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+                note_index = midi_number % 12
+                octave = (midi_number // 12) - 1
+                note = notes[note_index]
+                return note + str(octave)
+
             time, frequency, confidence, activation = crepe.predict(audio,sr,viterbi=True)
-            return time, frequency, confidence
-        
-        time, frequency, confidence = detect_pitch_crepe(f"recording{i}.wav")
-        print("Time: ", time)
-        print("Frequency: ", frequency)
-        print("Confidences: ", confidence)
+
+            notes =[]
+            for freq in frequency:
+                midi = freq_to_midi(freq)
+                note = midi_to_note_octave(midi)
+                notes.append(note)
 
         
 
